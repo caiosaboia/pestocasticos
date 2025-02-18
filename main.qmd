@@ -1,0 +1,117 @@
+---
+title: "Ising Model"
+#subtitle: " subtitulo"
+author: "Caio Rubem Saboia Monteiro"
+#date: "dd/mm/aaaa" #if necessary
+format:
+  html:
+    toc: false
+    number-sections: true
+    # toc-location: right-body
+    code-fold: false
+    # css: styles.css #if necessary
+    math: mathjax
+
+  pdf:
+    number-sections: true
+    toc: true
+    keep_tex: true
+
+latex-engine: xelatex
+
+# header-includes:
+#   - \usepackage{amsmath}
+#   - \usepackage{amsfonts}
+#   - \usepackage{amssymb}
+#   - \usepackage{listings}
+
+execute:
+  cache: true
+  enabled: true
+  freeze: true #can be use 'false' or auto
+  # daemon: false #default is 300, but can use boleean values too 
+
+#python
+jupyter: python3 #can be use for Julia too
+  # or can be use something like this:
+  # kernelspec:
+  #   name: "xpython"
+  #   language: "python"
+  #   display_name: "Python 3.7 (XPython)"
+
+
+# engine: julia # for more aplicatoins use quarto.org or :QuartoHelp Julia
+---
+
+# Importando biblitecas
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, PillowWriter
+from matplotlib.colors import ListedColormap
+```
+
+# Funcoes
+```{python}
+colors = ['#FF0000', '#0000FF']  # Vermelho para -1 (↓), Azul para +1 (↑)
+cmap = ListedColormap(colors)
+
+def initialize_grid(n):
+    """Inicializa a grade com spins aleatórios (-1 ou 1)."""
+    return np.random.choice([-1, 1], size=(n, n))
+
+def get_neighbors_sum(grid, i, j):
+    """Calcula a soma dos spins vizinhos com condições de contorno periódicas."""
+    n = grid.shape[0]
+    up = grid[(i-1) % n, j]
+    down = grid[(i+1) % n, j]
+    left = grid[i, (j-1) % n]
+    right = grid[i, (j+1) % n]
+    return up + down + left + right
+
+def metropolis_step(grid, beta):
+    """Executa um passo do algoritmo de Metropolis-Hastings."""
+    n = grid.shape[0]
+    i, j = np.random.randint(0, n, size=2)
+    current_spin = grid[i, j]
+    neighbors_sum = get_neighbors_sum(grid, i, j)
+    delta_E = 2 * current_spin * neighbors_sum
+    
+    if delta_E < 0 or np.random.rand() < np.exp(-beta * delta_E):
+        grid[i, j] *= -1
+    return grid
+
+def update(frame, img, grid, beta):
+    """Atualiza a animação com novos spins."""
+    for _ in range(100):  # Passos por frame
+        grid = metropolis_step(grid, beta)
+    img.set_data(grid)
+    return img,
+```
+
+
+```{python}
+n = 150
+beta = 1.5  # Usei os valores: 1.5, 0.1 e 2.5
+grid = initialize_grid(n)
+
+# Configuração da figura
+# fig, ax = plt.subplots(figsize=(8,8))
+# img = ax.imshow(grid, cmap=cmap, interpolation='none', vmin=-1, vmax=1)
+# ax.set_title(f'Modelo de Ising - β = {beta}\nVermelho: ↓ | Azul: ↑', fontsize=14)
+#
+# cbar = fig.colorbar(img, ax=ax, ticks=[-1, 1])
+# cbar.ax.set_yticklabels(['Spin ↓ (-1)', 'Spin ↑ (+1)'], fontsize=12)
+# plt.axis('off')
+
+#plt.show()
+```
+OBS: Eu salvei os arquivos como um gif para que ficasse mais apresentável.
+mas o codigo original esta em **isingmodel.py**
+
+Primeiro exemplo
+![gif 1](gif\ising_simu_b1.gif)
+Segundo exemplo
+![gif 2](gif\ising_simu_b2.gif)
+Terceiro exemplo
+![gif 3](gif\ising_simu_b3.gif)
