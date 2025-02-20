@@ -53,15 +53,15 @@ from matplotlib.colors import ListedColormap
 
 # Funcoes
 ```{python}
-colors = ['#FF0000', '#0000FF']  # Vermelho para -1 (↓), Azul para +1 (↑)
+colors = ['#FF0000', '#0000FF'] # Vermelho = seta para baixo, azul seta para cima;
 cmap = ListedColormap(colors)
 
+# Inicia matriz
 def initialize_grid(n):
-    """Inicializa a grade com spins aleatórios (-1 ou 1)."""
     return np.random.choice([-1, 1], size=(n, n))
 
+# Soma dos spins vizinhos
 def get_neighbors_sum(grid, i, j):
-    """Calcula a soma dos spins vizinhos com condições de contorno periódicas."""
     n = grid.shape[0]
     up = grid[(i-1) % n, j]
     down = grid[(i+1) % n, j]
@@ -69,8 +69,8 @@ def get_neighbors_sum(grid, i, j):
     right = grid[i, (j+1) % n]
     return up + down + left + right
 
+# Metropolis-Hastings
 def metropolis_step(grid, beta):
-    """Executa um passo do algoritmo de Metropolis-Hastings."""
     n = grid.shape[0]
     i, j = np.random.randint(0, n, size=2)
     current_spin = grid[i, j]
@@ -81,21 +81,22 @@ def metropolis_step(grid, beta):
         grid[i, j] *= -1
     return grid
 
+# Animaçao, meramente ilustrativo, desconsidere
 def update(frame, img, grid, beta):
-    """Atualiza a animação com novos spins."""
-    for _ in range(100):  # Passos por frame
+    for _ in range(100):
         grid = metropolis_step(grid, beta)
     img.set_data(grid)
     return img,
 ```
 
-
+Paramêtros
 ```{python}
 n = 150
 beta = 1.5  # Usei os valores: 1.5, 0.1 e 2.5
 grid = initialize_grid(n)
 
-# Configuração da figura
+# Aqui é a configuração para salvar os gif's, rodar somente se nescessário.
+
 # fig, ax = plt.subplots(figsize=(8,8))
 # img = ax.imshow(grid, cmap=cmap, interpolation='none', vmin=-1, vmax=1)
 # ax.set_title(f'Modelo de Ising - β = {beta}\nVermelho: ↓ | Azul: ↑', fontsize=14)
